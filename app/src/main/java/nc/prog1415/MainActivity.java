@@ -3,24 +3,30 @@ package nc.prog1415;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Handler;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import java.io.IOException;
+import java.net.Socket;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.InetAddress;
 
 public class MainActivity extends AppCompatActivity {
 
-    Connection con;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d("INITIALIZE","Creating main activity");
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-       // final Connection con = new Connection();
-        //con.execute();
+        final Connection con = new Connection();
+        con.execute();
 
         final EditText et = (EditText)findViewById(R.id.editText2);
         final Button b = (Button)findViewById(R.id.button2);
@@ -28,23 +34,42 @@ public class MainActivity extends AppCompatActivity {
 
         //event to send user's input to the server
         b.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View view) {
-                if(et.getText().length() > 0) {
-                    try {
-                        con.out.writeObject(et.getText());
-                        con.out.flush();
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
+                Handler h = new Handler();
+                h.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            while (!con.connected)
+                                this.wait();
+                        }
+                        catch (InterruptedException e){}
+
+                        if(et.getText().length() > 0) {
+                            try {
+                                con.out.writeObject(et.getText());
+                                con.out.flush();
+                            } catch (IOException e1) {
+                                e1.printStackTrace();
+                            }
+                        }
                     }
-                }
+                });
             }
         });
+
 
         Handler handler = new Handler();
         handler.post(new Runnable() {
             @Override
             public void run() {
+                try {
+                    while (!con.connected)
+                        this.wait();
+                } catch (InterruptedException e) {
+                }
                 while(true) {
                     try {
                         Object obj = con.in.readObject();
