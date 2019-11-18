@@ -17,6 +17,7 @@ import java.net.InetAddress;
 
 public class MainActivity extends AppCompatActivity {
 
+    final Connection con = new Connection();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,12 +26,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        final Connection con = new Connection();
         con.execute();
 
+        final TextView tv = (TextView)findViewById(R.id.textView);
         final EditText et = (EditText)findViewById(R.id.editText2);
         final Button b = (Button)findViewById(R.id.button2);
-        final TextView tv = (TextView)findViewById(R.id.textView);
+
 
         //event to send user's input to the server
         b.setOnClickListener(new View.OnClickListener() {
@@ -49,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
 
                         if(et.getText().length() > 0) {
                             try {
-                                con.out.writeObject(et.getText());
+                                con.out.writeObject(et.getText().toString());
                                 con.out.flush();
                             } catch (IOException e1) {
                                 e1.printStackTrace();
@@ -59,28 +60,32 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
         });
+    }
 
+/*   @Override
+    protected void onResume()
+    {
+        super.onResume();
+        final TextView tv = (TextView)findViewById(R.id.textView);
 
         Handler handler = new Handler();
         handler.post(new Runnable() {
             @Override
             public void run() {
-                try {
-                    while (!con.connected)
-                        this.wait();
-                } catch (InterruptedException e) {
-                }
                 while(true) {
-                    try {
-                        Object obj = con.in.readObject();
-                        if(obj instanceof String) {
-                            String content = tv.getText().toString();
-                            content += obj.toString() + "\n";
-                            tv.setText(content);
+                    if(con.connected) {
+                        try {
+                            Object obj = con.in.readObject();
+                            if (obj instanceof String) {
+                                String content = tv.getText().toString();
+                                content += obj.toString() + "\n";
+                                tv.setText(content);
+                            }
+                        } catch (Exception e) {
                         }
-                    } catch (Exception e) { }
+                    }
                 }
             }
         });
-    }
+    }*/
 }

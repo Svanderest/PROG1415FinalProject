@@ -25,7 +25,7 @@ class Connection extends AsyncTask<Void, byte[], Boolean> {
     protected Boolean doInBackground(Void... voids) {
         Log.d("CONNECTION","Connecting to server");
         try {
-            InetAddress address = InetAddress.getByName("192.168.93.62");
+            InetAddress address = InetAddress.getByName("192.168.93.77");
             socket = new Socket(address,8000);
             out = new ObjectOutputStream(socket.getOutputStream());
             in = new ObjectInputStream(socket.getInputStream());
