@@ -11,14 +11,11 @@ import java.net.Socket;
 
 class Connection extends AsyncTask<Void, byte[], Boolean> {
 
-    public boolean connected;
-    public Socket socket;
-    public ObjectInputStream in;
-    public ObjectOutputStream out;
+    public  TcpClient client;
 
-    public Connection()
+    public Connection(TcpClient t)
     {
-        connected = false;
+        client = t;
     }
 
     @Override
@@ -26,13 +23,13 @@ class Connection extends AsyncTask<Void, byte[], Boolean> {
         Log.d("CONNECTION","Connecting to server");
         try {
             InetAddress address = InetAddress.getByName("192.168.93.77");
-            socket = new Socket(address,8000);
-            out = new ObjectOutputStream(socket.getOutputStream());
-            in = new ObjectInputStream(socket.getInputStream());
+            client.socket = new Socket(address,8000);
+            client.out = new ObjectOutputStream(client.socket.getOutputStream());
+            client.in = new ObjectInputStream(client.socket.getInputStream());
         } catch (IOException e) {
             e.printStackTrace();
         }
-        connected = true;
+        client.connected = true;
         return null;
     }
 }

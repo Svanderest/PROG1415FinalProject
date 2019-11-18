@@ -16,17 +16,15 @@ import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 
 public class MainActivity extends AppCompatActivity {
-
-    final Connection con = new Connection();
+    TcpClient client;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d("INITIALIZE","Creating main activity");
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        con.execute();
+        client = new TcpClient();
 
         final TextView tv = (TextView)findViewById(R.id.textView);
         final EditText et = (EditText)findViewById(R.id.editText2);
@@ -38,54 +36,11 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View view) {
-                Handler h = new Handler();
-                h.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            while (!con.connected)
-                                this.wait();
-                        }
-                        catch (InterruptedException e){}
-
-                        if(et.getText().length() > 0) {
-                            try {
-                                con.out.writeObject(et.getText().toString());
-                                con.out.flush();
-                            } catch (IOException e1) {
-                                e1.printStackTrace();
-                            }
-                        }
-                    }
-                });
+                String text = et.getText().toString();
+                client.send(text);
             }
         });
+
+        client.receive(tv);
     }
-
-/*   @Override
-    protected void onResume()
-    {
-        super.onResume();
-        final TextView tv = (TextView)findViewById(R.id.textView);
-
-        Handler handler = new Handler();
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                while(true) {
-                    if(con.connected) {
-                        try {
-                            Object obj = con.in.readObject();
-                            if (obj instanceof String) {
-                                String content = tv.getText().toString();
-                                content += obj.toString() + "\n";
-                                tv.setText(content);
-                            }
-                        } catch (Exception e) {
-                        }
-                    }
-                }
-            }
-        });
-    }*/
 }
