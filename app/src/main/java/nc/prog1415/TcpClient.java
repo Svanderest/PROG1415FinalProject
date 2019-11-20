@@ -12,6 +12,15 @@ import java.net.InetAddress;
 import java.net.Socket;
 
 public class TcpClient extends AsyncTask<Void, byte[], Boolean> {
+    private static TcpClient singletonClient;
+
+    public static TcpClient getClient()
+    {
+        if(singletonClient == null)
+            singletonClient = new TcpClient();
+        return singletonClient;
+    }
+
     public Boolean connected;
     public Socket socket;
     public ObjectInputStream in;
@@ -27,7 +36,7 @@ public class TcpClient extends AsyncTask<Void, byte[], Boolean> {
     protected Boolean doInBackground(Void... voids) {
         Log.d("CONNECTION","Connecting to server");
         try {
-            InetAddress address = InetAddress.getByName("192.168.93.77");
+            InetAddress address = InetAddress.getByName("192.168.86.163");
             socket = new Socket(address,8000);
             out = new ObjectOutputStream(socket.getOutputStream());
             in = new ObjectInputStream(socket.getInputStream());

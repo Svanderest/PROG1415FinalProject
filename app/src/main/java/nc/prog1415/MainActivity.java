@@ -23,9 +23,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d("INITIALIZE","Creating main activity");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        client = new TcpClient();
-
+        client = TcpClient.getClient();
         final TextView tv = (TextView)findViewById(R.id.textView);
         final EditText et = (EditText)findViewById(R.id.editText2);
         final Button b = (Button)findViewById(R.id.button2);
