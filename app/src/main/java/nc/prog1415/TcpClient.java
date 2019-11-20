@@ -1,14 +1,17 @@
 package nc.prog1415;
 
+import android.os.AsyncTask;
 import android.os.Handler;
+import android.util.Log;
 import android.widget.TextView;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.InetAddress;
 import java.net.Socket;
 
-public class TcpClient {
+public class TcpClient extends AsyncTask<Void, byte[], Boolean> {
     public Boolean connected;
     public Socket socket;
     public ObjectInputStream in;
@@ -16,27 +19,38 @@ public class TcpClient {
 
     public TcpClient()
     {
-        Connection con = new Connection(this);
-        con.execute();
+        connected = false;
+        this.execute();
     }
 
-    public synchronized void send(final String str)
+    @Override
+    protected Boolean doInBackground(Void... voids) {
+        Log.d("CONNECTION","Connecting to server");
+        try {
+            InetAddress address = InetAddress.getByName("192.168.93.77");
+            socket = new Socket(address,8000);
+            out = new ObjectOutputStream(socket.getOutputStream());
+            in = new ObjectInputStream(socket.getInputStream());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        connected = true;
+        return null;
+    }
+
+    public void send(final String str)
     {
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
-                try {
-                    while (!connected)
-                        this.wait();
-                }
-                catch (InterruptedException e){}
+                if (!connected)
+                    return;
                 try {
                     out.writeObject(str);
                     out.flush();
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
-                this.notify();
             }
         });
         t.start();
@@ -44,32 +58,38 @@ public class TcpClient {
 
     public void receive(final TextView tv)
     {
-        Handler handler = new Handler();
-        handler.post(new Runnable() {
+        final Handler handler = new Handler();
+        Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
-                String content = tv.getText().toString();
-                synchronized (this)
-                {
+                int i = 0;
+                while (!connected) {
                     try {
-                        while (!connected)
-                            this.wait();
-                    } catch (InterruptedException e) {}
-                    try
-                    {
-                        Object obj = in.readObject();
-                        while (!(obj instanceof String))
-                        {
-                            this.wait();
-                            obj = in.readObject();
-                        }
-                        content += obj.toString();
-                    }catch (Exception e) {}
-                    this.notify();
+                        this.wait();
+                    } catch (Exception e)
+                    {}
                 }
-                tv.setText(content);
+                try {
+                    while (true) {
+                        Object obj = in.readObject();
+                        if (obj instanceof String) {
+                                Log.d("READ", obj.toString());
+                                final String newMessage = "\n" + obj.toString();
+                                handler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        tv.append(newMessage);
+                                    }
+                                });
+
+                        }
+                    }
+                } catch (Exception e) {
+                    Log.d("Error",e.getMessage());
+                }
             }
         });
+        t.start();
     }
 
 }
