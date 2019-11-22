@@ -1,6 +1,11 @@
 package nc.prog1415;
 
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.widget.TextView;
@@ -14,21 +19,60 @@ import java.net.Socket;
 public class TcpClient extends AsyncTask<Void, byte[], Boolean> {
     private static TcpClient singletonClient;
 
-    public static TcpClient getClient()
+    public static TcpClient getClient(LocationManager lm)
     {
         if(singletonClient == null)
-            singletonClient = new TcpClient();
+            singletonClient = new TcpClient(lm);
+        return singletonClient;
+    }
+
+    public static TcpClient getClient()
+    {
         return singletonClient;
     }
 
     public Boolean connected;
-    public Socket socket;
-    public ObjectInputStream in;
-    public ObjectOutputStream out;
+    private Socket socket;
+    private ObjectInputStream in;
+    private ObjectOutputStream out;
+    private LocationManager lm;
+    private Location location = null;
 
-    public TcpClient()
+    public TcpClient(LocationManager lm)
     {
         connected = false;
+        this.lm = lm;
+        Criteria criteria = new Criteria();
+        criteria.setAccuracy(Criteria.NO_REQUIREMENT);
+        criteria.setPowerRequirement(Criteria.NO_REQUIREMENT);
+
+        //display the best service available based on the required criteria
+        String best = lm.getBestProvider(criteria, true);
+        try {
+            lm.requestLocationUpdates(best, 10000, 5, new LocationListener() {
+                @Override
+                public void onLocationChanged(Location location) {
+                    TcpClient.this.location = location;
+                }
+
+                @Override
+                public void onStatusChanged(String s, int i, Bundle bundle) {
+
+                }
+
+                @Override
+                public void onProviderEnabled(String s) {
+
+                }
+
+                @Override
+                public void onProviderDisabled(String s) {
+
+                }
+            });
+        } catch (SecurityException e) {
+            Log.d("ERROR", e.getMessage());
+        }
         this.execute();
     }
 
@@ -36,7 +80,7 @@ public class TcpClient extends AsyncTask<Void, byte[], Boolean> {
     protected Boolean doInBackground(Void... voids) {
         Log.d("CONNECTION","Connecting to server");
         try {
-            InetAddress address = InetAddress.getByName("192.168.93.77");
+            InetAddress address = InetAddress.getByName("192.168.93.62");
             socket = new Socket(address,8000);
             out = new ObjectOutputStream(socket.getOutputStream());
             in = new ObjectInputStream(socket.getInputStream());
@@ -71,7 +115,6 @@ public class TcpClient extends AsyncTask<Void, byte[], Boolean> {
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
-                int i = 0;
                 while (!connected) {
                     try {
                         this.wait();

@@ -1,6 +1,8 @@
 package nc.prog1415;
 
+import android.content.Context;
 import android.content.Intent;
+import android.location.LocationManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
@@ -19,29 +21,22 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
         final ImageView iv = (ImageView)findViewById( R.id.imageView);
-        //iv.setOnSystemUiVisibilityChangeListener();
-        client = TcpClient.getClient();
-    }
-
-    protected void onResume()
-    {
-        super.onResume();
+        client = TcpClient.getClient((LocationManager) this.getSystemService(Context.LOCATION_SERVICE));
         mp = MediaPlayer.create(this, R.raw.startup);
         mp.start();
 
-        Handler h = new Handler();
-        h.post(new Runnable() {
+        final Handler h = new Handler();
+        h.postDelayed(new Runnable() {
             @Override
-            public synchronized void run() {
-                while (!client.connected || mp.isPlaying())
+            public void run() {
+                if(client.connected && !mp.isPlaying())
                 {
-                    try {
-                        this.wait();
-                    } catch (InterruptedException e){ Log.d("DEBUG", e.getMessage());}
+                    Intent i = new Intent(SplashActivity.this, MainActivity.class);
+                    startActivity(i);
                 }
-                Intent i = new Intent(SplashActivity.this, MainActivity.class);
-                startActivity(i);
+                else
+                    h.postDelayed(this,1500);
             }
-        });
+        }, 1500);
     }
 }

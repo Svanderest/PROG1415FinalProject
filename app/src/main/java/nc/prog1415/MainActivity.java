@@ -1,6 +1,12 @@
 package nc.prog1415;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Context;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Handler;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,6 +23,8 @@ import java.net.InetAddress;
 
 public class MainActivity extends AppCompatActivity {
     TcpClient client;
+    private LocationManager lm;
+    private Location location;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,7 +35,6 @@ public class MainActivity extends AppCompatActivity {
         final TextView tv = (TextView)findViewById(R.id.textView);
         final EditText et = (EditText)findViewById(R.id.editText2);
         final Button b = (Button)findViewById(R.id.button2);
-
 
         //event to send user's input to the server
         b.setOnClickListener(new View.OnClickListener() {
