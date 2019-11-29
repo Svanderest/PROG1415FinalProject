@@ -18,15 +18,15 @@ public class SplashActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d("INITIALIZE", "Creating main activity");
+        String ip = this.getResources().getString(R.string.ServerAddress);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
         final ImageView iv = (ImageView)findViewById( R.id.imageView);
-        client = TcpClient.getClient((LocationManager) this.getSystemService(Context.LOCATION_SERVICE));
+        client = TcpClient.getClient((LocationManager) this.getSystemService(Context.LOCATION_SERVICE), ip);
         mp = MediaPlayer.create(this, R.raw.startup);
         mp.start();
-
-        final Handler h = new Handler();
-        h.postDelayed(new Runnable() {
+        client.receive(new Runnable() {
+            final Handler h = new Handler();
             @Override
             public void run() {
                 if(client.connected && !mp.isPlaying())
@@ -37,6 +37,6 @@ public class SplashActivity extends AppCompatActivity {
                 else
                     h.postDelayed(this,1500);
             }
-        }, 1500);
+        });
     }
 }

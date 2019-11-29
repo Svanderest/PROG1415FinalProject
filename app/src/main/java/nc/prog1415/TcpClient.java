@@ -1,5 +1,7 @@
 package nc.prog1415;
 
+import android.content.Intent;
+import android.content.res.Resources;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -15,14 +17,17 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.ArrayList;
+
+import nc.com.Business;
 
 public class TcpClient extends AsyncTask<Void, byte[], Boolean> {
     private static TcpClient singletonClient;
 
-    public static TcpClient getClient(LocationManager lm)
+    public static TcpClient getClient(LocationManager lm, String serverLocation)
     {
         if(singletonClient == null)
-            singletonClient = new TcpClient(lm);
+            singletonClient = new TcpClient(lm, serverLocation);
         return singletonClient;
     }
 
@@ -31,17 +36,20 @@ public class TcpClient extends AsyncTask<Void, byte[], Boolean> {
         return singletonClient;
     }
 
+    public ArrayList<Business> businesses = new ArrayList<Business>();
     public Boolean connected;
     private Socket socket;
     private ObjectInputStream in;
     private ObjectOutputStream out;
     private LocationManager lm;
     private Location location = null;
+    String serverLocation;
 
-    public TcpClient(LocationManager lm)
+    public TcpClient(LocationManager lm, String serverLocation)
     {
         connected = false;
         this.lm = lm;
+        this.serverLocation = serverLocation;
         Criteria criteria = new Criteria();
         criteria.setAccuracy(Criteria.NO_REQUIREMENT);
         criteria.setPowerRequirement(Criteria.NO_REQUIREMENT);
@@ -52,7 +60,14 @@ public class TcpClient extends AsyncTask<Void, byte[], Boolean> {
             lm.requestLocationUpdates(best, 10000, 5, new LocationListener() {
                 @Override
                 public void onLocationChanged(Location location) {
-                    TcpClient.this.location = location;
+                    if (connected) {
+                        Boolean firstUpdate = TcpClient.this.location == null;
+                        TcpClient.this.location = location;
+                        if (firstUpdate) {
+                            nc.com.Location l = new nc.com.Location(location.getLongitude(), location.getLatitude());
+                            send(l);
+                        }
+                    }
                 }
 
                 @Override
@@ -71,7 +86,7 @@ public class TcpClient extends AsyncTask<Void, byte[], Boolean> {
                 }
             });
         } catch (SecurityException e) {
-            Log.d("ERROR", e.getMessage());
+            e.printStackTrace();
         }
         this.execute();
     }
@@ -80,7 +95,8 @@ public class TcpClient extends AsyncTask<Void, byte[], Boolean> {
     protected Boolean doInBackground(Void... voids) {
         Log.d("CONNECTION","Connecting to server");
         try {
-            InetAddress address = InetAddress.getByName("192.168.93.62");
+            InetAddress address = InetAddress.getByName(serverLocation);
+                    Resources.getSystem().getString(R.string.ServerAddress);
             socket = new Socket(address,8000);
             out = new ObjectOutputStream(socket.getOutputStream());
             in = new ObjectInputStream(socket.getInputStream());
@@ -91,7 +107,7 @@ public class TcpClient extends AsyncTask<Void, byte[], Boolean> {
         return null;
     }
 
-    public void send(final String str)
+    public void send(final Object message)
     {
         Thread t = new Thread(new Runnable() {
             @Override
@@ -99,10 +115,46 @@ public class TcpClient extends AsyncTask<Void, byte[], Boolean> {
                 if (!connected)
                     return;
                 try {
-                    out.writeObject(str);
+                    out.writeObject(message);
                     out.flush();
                 } catch (IOException e1) {
                     e1.printStackTrace();
+                }
+            }
+        });
+        t.start();
+    }
+
+    public void receive(final Runnable onReceipt)
+    {
+        final Handler h = new Handler();
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (!connected) {
+                    try {
+                        this.wait();
+                    } catch (Exception e)
+                    {}
+                }
+                try {
+                    boolean validResult = false;
+                    while (!validResult)
+                    {
+                        Object obj = in.readObject();
+                        if(obj instanceof ArrayList && ((ArrayList)obj).size() > 0)
+                        {
+                            if(((ArrayList)obj).get(0) instanceof Business)
+                            {
+                                businesses = (ArrayList<Business>) obj;
+                                validResult = true;
+                            }
+                        }
+                    }
+                    h.post(onReceipt);
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         });
