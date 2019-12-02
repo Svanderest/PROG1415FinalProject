@@ -24,10 +24,10 @@ import nc.com.Business;
 public class TcpClient extends AsyncTask<Void, byte[], Boolean> {
     private static TcpClient singletonClient;
 
-    public static TcpClient getClient(LocationManager lm, String serverLocation)
+    public static TcpClient getClient(LocationManager lm)
     {
         if(singletonClient == null)
-            singletonClient = new TcpClient(lm, serverLocation);
+            singletonClient = new TcpClient(lm);
         return singletonClient;
     }
 
@@ -45,11 +45,10 @@ public class TcpClient extends AsyncTask<Void, byte[], Boolean> {
     private Location location = null;
     String serverLocation;
 
-    public TcpClient(LocationManager lm, String serverLocation)
+    public TcpClient(LocationManager lm)
     {
         connected = false;
         this.lm = lm;
-        this.serverLocation = serverLocation;
         Criteria criteria = new Criteria();
         criteria.setAccuracy(Criteria.NO_REQUIREMENT);
         criteria.setPowerRequirement(Criteria.NO_REQUIREMENT);
@@ -95,8 +94,7 @@ public class TcpClient extends AsyncTask<Void, byte[], Boolean> {
     protected Boolean doInBackground(Void... voids) {
         Log.d("CONNECTION","Connecting to server");
         try {
-            InetAddress address = InetAddress.getByName(serverLocation);
-                    Resources.getSystem().getString(R.string.ServerAddress);
+            InetAddress address = InetAddress.getByName("192.168.93.84");
             socket = new Socket(address,8000);
             out = new ObjectOutputStream(socket.getOutputStream());
             in = new ObjectInputStream(socket.getInputStream());

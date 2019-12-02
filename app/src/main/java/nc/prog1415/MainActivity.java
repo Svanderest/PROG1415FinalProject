@@ -1,6 +1,8 @@
 package nc.prog1415;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
 import android.location.Criteria;
@@ -29,23 +31,17 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d("INITIALIZE","Creating main activity");
+        Log.d("Items Received",String.valueOf(TcpClient.getClient().businesses.size()));
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        client = TcpClient.getClient();
-        final TextView tv = (TextView)findViewById(R.id.textView);
-        final EditText et = (EditText)findViewById(R.id.editText2);
-        final Button b = (Button)findViewById(R.id.button2);
-
-        //event to send user's input to the server
-        b.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-                String text = et.getText().toString();
-                client.send(text);
-            }
-        });
-
-        client.receive(tv);
+        //client = TcpClient.getClient();
+        ViewAdapter adapter = new ViewAdapter();
+        RecyclerView rv = (RecyclerView)findViewById(R.id.rvBusiness);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this.getApplicationContext());
+        rv.setLayoutManager(layoutManager);
+        rv.setHasFixedSize(true);
+        rv.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
+        //client.receive();
     }
 }
