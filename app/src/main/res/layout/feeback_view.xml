@@ -5,35 +5,21 @@
     android:orientation="vertical">
 
     <TextView
-        android:id="@+id/businessName"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="TextView" />
-
-    <TextView
-        android:id="@+id/businessAddress"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="TextView" />
-
-    <TextView
-        android:id="@+id/buisnessWebsite"
+        android:id="@+id/feedbackDate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="TextView" />
 
     <RatingBar
-        android:id="@+id/businessRating"
+        android:id="@+id/feedbackRating"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:isIndicator="false"
-        android:max="6"
         android:numStars="6"
         android:stepSize="0.1" />
 
-    <Button
-        android:id="@+id/buttonFeedback"
+    <TextView
+        android:id="@+id/feedbackComment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/feedback_button" />
+        android:text="TextView" />
 </LinearLayout>

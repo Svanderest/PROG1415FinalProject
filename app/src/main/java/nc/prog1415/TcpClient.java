@@ -20,6 +20,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 import nc.com.Business;
+import nc.com.Feedback;
 
 public class TcpClient extends AsyncTask<Void, byte[], Boolean> {
     private static TcpClient singletonClient;
@@ -37,6 +38,7 @@ public class TcpClient extends AsyncTask<Void, byte[], Boolean> {
     }
 
     public ArrayList<Business> businesses = new ArrayList<Business>();
+    public ArrayList<Feedback> feedback = new ArrayList<Feedback>();
     public Boolean connected;
     private Socket socket;
     private ObjectInputStream in;
@@ -94,7 +96,7 @@ public class TcpClient extends AsyncTask<Void, byte[], Boolean> {
     protected Boolean doInBackground(Void... voids) {
         Log.d("CONNECTION","Connecting to server");
         try {
-            InetAddress address = InetAddress.getByName("192.168.93.84");
+            InetAddress address = InetAddress.getByName("192.168.93.77");
             socket = new Socket(address,8000);
             out = new ObjectOutputStream(socket.getOutputStream());
             in = new ObjectInputStream(socket.getInputStream());
@@ -147,7 +149,15 @@ public class TcpClient extends AsyncTask<Void, byte[], Boolean> {
                                 businesses = (ArrayList<Business>) obj;
                                 validResult = true;
                             }
+                            else if(((ArrayList)obj).get(0) instanceof Feedback) {
+                                feedback = (ArrayList<Feedback>)obj;
+                                validResult = true;
+                            }
                         }
+                        else if(obj instanceof ArrayList && ((ArrayList)obj).size() == 0)
+                            Log.d("SIZE ERROR", "Empty list received");
+                        else
+                            Log.d("MESSAGE TYPE",obj.getClass().getName());
                     }
                     h.post(onReceipt);
                 }

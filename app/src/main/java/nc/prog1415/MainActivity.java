@@ -24,7 +24,7 @@ import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 
 public class MainActivity extends AppCompatActivity {
-    TcpClient client;
+
     private LocationManager lm;
     private Location location;
 
@@ -34,14 +34,12 @@ public class MainActivity extends AppCompatActivity {
         Log.d("Items Received",String.valueOf(TcpClient.getClient().businesses.size()));
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //client = TcpClient.getClient();
-        ViewAdapter adapter = new ViewAdapter();
+        BusinessViewAdapter adapter = new BusinessViewAdapter(this);
         RecyclerView rv = (RecyclerView)findViewById(R.id.rvBusiness);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this.getApplicationContext());
         rv.setLayoutManager(layoutManager);
         rv.setHasFixedSize(true);
         rv.setAdapter(adapter);
         adapter.notifyDataSetChanged();
-        //client.receive();
     }
 }

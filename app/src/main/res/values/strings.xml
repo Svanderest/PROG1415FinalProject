@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">InstaFeed</string>
     <string name="ChatStart">Ready...</string>
-    <string name="ServerAddress">192.168.93.62</string>
-    <string name="feedback_button">Leave Review</string>
+    <string name="feedback_button">View Feedback</string>
 </resources>
