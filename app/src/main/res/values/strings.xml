@@ -2,4 +2,6 @@
     <string name="app_name">InstaFeed</string>
     <string name="ChatStart">Ready...</string>
     <string name="feedback_button">View Feedback</string>
+    <string name="btnReviewText">Write Review</string>
+    <string name="btnSubmitTest">Submit</string>
 </resources>

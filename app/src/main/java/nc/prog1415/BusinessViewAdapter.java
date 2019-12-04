@@ -39,6 +39,7 @@ public class BusinessViewAdapter extends RecyclerView.Adapter<BusinessViewAdapte
         holder.tvName.setText(item.name);
         holder.tvAddress.setText(item.address);
         holder.tvWebsite.setText(item.website);
+        holder.tvWebsite.setOnLongClickListener(new LinkListener());
         holder.rb.setNumStars(6);
         holder.rb.setStepSize(0.1f);
         holder.rb.setRating(item.averageRating);

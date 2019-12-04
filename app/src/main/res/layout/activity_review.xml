@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/reviewBusinessName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="TextView" />
+
+    <RatingBar
+        android:id="@+id/reviewRating"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:numStars="6"
+        android:stepSize="0.1" />
+
+    <MultiAutoCompleteTextView
+        android:id="@+id/reviewComment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:id="@+id/btnSubmit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/btnSubmitTest" />
+</LinearLayout>
