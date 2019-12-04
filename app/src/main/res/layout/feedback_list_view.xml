@@ -7,13 +7,17 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:paddingLeft="15dp"
+        android:paddingBottom="20dp">
 
         <TextView
             android:id="@+id/tvName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="TextView" />
+            android:text="TextView"
+            android:textSize="24sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/tvAddress"
@@ -25,14 +29,17 @@
             android:id="@+id/tvWebsite"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="TextView" />
+            android:text="TextView"
+            android:textColor="#2196F3" />
 
-        <Button
-            android:id="@+id/btnReview"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/btnReviewText" />
     </LinearLayout>
+
+    <Button
+        android:id="@+id/btnReview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:text="@string/btnReviewText" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvFeedback"
