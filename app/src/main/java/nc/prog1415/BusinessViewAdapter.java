@@ -49,7 +49,6 @@ public class BusinessViewAdapter extends RecyclerView.Adapter<BusinessViewAdapte
         holder.leaveReview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //TODO: Get feed back for business and navigate to feedback view
                 client.receive(new Runnable() {
                     @Override
                     public void run() {

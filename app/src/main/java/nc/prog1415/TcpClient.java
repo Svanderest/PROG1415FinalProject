@@ -18,6 +18,8 @@ import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import nc.com.Business;
 import nc.com.Feedback;
@@ -44,7 +46,7 @@ public class TcpClient extends AsyncTask<Void, byte[], Boolean> {
     private ObjectInputStream in;
     private ObjectOutputStream out;
     private LocationManager lm;
-    private Location location = null;
+    public Location location = null;
     String serverLocation;
 
     public TcpClient(LocationManager lm)
@@ -96,7 +98,7 @@ public class TcpClient extends AsyncTask<Void, byte[], Boolean> {
     protected Boolean doInBackground(Void... voids) {
         Log.d("CONNECTION","Connecting to server");
         try {
-            InetAddress address = InetAddress.getByName("192.168.93.77");
+            InetAddress address = InetAddress.getByName("192.168.93.62");
             socket = new Socket(address,8000);
             out = new ObjectOutputStream(socket.getOutputStream());
             in = new ObjectInputStream(socket.getInputStream());
@@ -134,8 +136,11 @@ public class TcpClient extends AsyncTask<Void, byte[], Boolean> {
                 while (!connected) {
                     try {
                         this.wait();
-                    } catch (Exception e)
-                    {}
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
                 }
                 try {
                     boolean validResult = false;
@@ -147,15 +152,41 @@ public class TcpClient extends AsyncTask<Void, byte[], Boolean> {
                             if(((ArrayList)obj).get(0) instanceof Business)
                             {
                                 businesses = (ArrayList<Business>) obj;
+                                final nc.com.Location myLocation = new nc.com.Location(location.getLongitude(),location.getLatitude());
+                                Collections.sort(businesses, new Comparator<Business>() {
+                                    @Override
+                                    public int compare(Business business, Business t1) {
+                                        if(business.getDistance(myLocation) < t1.getDistance(myLocation))
+                                            return -1;
+                                        else if(business.getDistance(myLocation) > t1.getDistance(myLocation))
+                                            return 1;
+                                        else
+                                            return 0;
+                                    }
+                                });
                                 validResult = true;
+                                for(int i = 0; i < businesses.size(); i++)
+                                {
+                                    long distance = Math.round(myLocation.getDistance(businesses.get(i)));
+                                    if(distance < 1000)
+                                        businesses.get(i).address += " - " + String.valueOf(distance) + "m";
+                                    else
+                                        businesses.get(i).address += " - " + String.valueOf(distance / 1000.0) + "km";
+                                }
                             }
                             else if(((ArrayList)obj).get(0) instanceof Feedback) {
                                 feedback = (ArrayList<Feedback>)obj;
+                                Collections.sort(feedback, new Comparator<Feedback>() {
+                                    @Override
+                                    public int compare(Feedback feedback, Feedback t1) {
+                                        return -feedback.date.compareTo(t1.date);
+                                    }
+                                });
                                 validResult = true;
                             }
                         }
                         else if(obj instanceof ArrayList && ((ArrayList)obj).size() == 0)
-                            Log.d("SIZE ERROR", "Empty list received");
+                            validResult = true;
                         else
                             Log.d("MESSAGE TYPE",obj.getClass().getName());
                     }

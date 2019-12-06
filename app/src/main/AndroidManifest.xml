@@ -21,6 +21,7 @@
         <activity android:name=".MainActivity"/>
         <activity android:name=".FeedbackListActivity"/>
         <activity android:name=".ReviewActivity"/>
+        <activity android:name=".NotFoundActivity"/>
     </application>
 
 </manifest>

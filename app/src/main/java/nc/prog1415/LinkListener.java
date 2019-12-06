@@ -13,13 +13,12 @@ public class LinkListener implements View.OnLongClickListener {
     public boolean onLongClick(View view) {
         String url = "https://" + ((TextView)view).getText();
         Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-        Context context = view.getContext();
-        while (context instanceof ContextWrapper) {
+        for(Context context = view.getContext(); context instanceof ContextWrapper; context = ((ContextWrapper)context).getBaseContext())
+        {
             if (context instanceof Activity) {
                 ((Activity)context).startActivity(i);
                 break;
             }
-            context = ((ContextWrapper)context).getBaseContext();
         }
         return true;
     }

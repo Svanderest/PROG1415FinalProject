@@ -4,4 +4,7 @@
     <string name="feedback_button">View Feedback</string>
     <string name="btnReviewText">Write Review</string>
     <string name="btnSubmitTest">Submit</string>
+    <string name="notFoundTitle">No businesses near you found</string>
+    <string name="notFoundDebug">The server currently only has business in Welland, ON. Latitude between 42.96 and 43.02. Longitude between -79.21 and -79.29</string>
+    <string name="tryAgain">Try Again</string>
 </resources>
