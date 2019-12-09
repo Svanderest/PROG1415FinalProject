@@ -41,6 +41,7 @@ public class TcpClient extends AsyncTask<Void, byte[], Boolean> {
 
     public ArrayList<Business> businesses = new ArrayList<Business>();
     public ArrayList<Feedback> feedback = new ArrayList<Feedback>();
+    public ArrayList<Integer> sent = new ArrayList<Integer>();
     public Boolean connected;
     private Socket socket;
     private ObjectInputStream in;
@@ -69,6 +70,7 @@ public class TcpClient extends AsyncTask<Void, byte[], Boolean> {
                         if (firstUpdate) {
                             nc.com.Location l = new nc.com.Location(location.getLongitude(), location.getLatitude());
                             send(l);
+                            //sent.add(TcpClient.this.hashCode());
                         }
                     }
                 }
@@ -98,10 +100,10 @@ public class TcpClient extends AsyncTask<Void, byte[], Boolean> {
     protected Boolean doInBackground(Void... voids) {
         Log.d("CONNECTION","Connecting to server");
         try {
-            InetAddress address = InetAddress.getByName("192.168.93.62");
+            InetAddress address = InetAddress.getByName("192.168.93.77");
             socket = new Socket(address,8000);
-            out = new ObjectOutputStream(socket.getOutputStream());
             in = new ObjectInputStream(socket.getInputStream());
+            out = new ObjectOutputStream(socket.getOutputStream());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -119,6 +121,8 @@ public class TcpClient extends AsyncTask<Void, byte[], Boolean> {
                 try {
                     out.writeObject(message);
                     out.flush();
+                    sent.add(message.hashCode());
+                    Log.d("HASH CODE SENT", String.valueOf(message.hashCode()));
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
@@ -126,16 +130,16 @@ public class TcpClient extends AsyncTask<Void, byte[], Boolean> {
         });
         t.start();
     }
-
-    public void receive(final Runnable onReceipt)
+    public void receive(final Runnable onReceipt, final int id)
     {
         final Handler h = new Handler();
+        Log.d("HASH CODE RECEIVING", String.valueOf(id));
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
-                while (!connected) {
+                while (!(connected  && (sent.contains(id) || id == 0))) {
                     try {
-                        this.wait();
+                        //this.wait();
                     }
                     catch (Exception e)
                     {
@@ -164,6 +168,7 @@ public class TcpClient extends AsyncTask<Void, byte[], Boolean> {
                                             return 0;
                                     }
                                 });
+                                Log.d("Business",String.valueOf(((ArrayList)obj).size()) + " business objects received");
                                 validResult = true;
                                 for(int i = 0; i < businesses.size(); i++)
                                 {
@@ -182,14 +187,19 @@ public class TcpClient extends AsyncTask<Void, byte[], Boolean> {
                                         return -feedback.date.compareTo(t1.date);
                                     }
                                 });
+                                Log.d("Feedback",String.valueOf(((ArrayList)obj).size()) + " feedback objects received");
                                 validResult = true;
                             }
                         }
-                        else if(obj instanceof ArrayList && ((ArrayList)obj).size() == 0)
+                        else if(obj instanceof ArrayList && ((ArrayList)obj).size() == 0) {
                             validResult = true;
+                            Log.d("Not found","No objects received");
+                        }
                         else
                             Log.d("MESSAGE TYPE",obj.getClass().getName());
+
                     }
+                    //sent.remove(id);
                     h.post(onReceipt);
                 }
                 catch (Exception e) {
@@ -199,40 +209,4 @@ public class TcpClient extends AsyncTask<Void, byte[], Boolean> {
         });
         t.start();
     }
-
-    public void receive(final TextView tv)
-    {
-        final Handler handler = new Handler();
-        Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (!connected) {
-                    try {
-                        this.wait();
-                    } catch (Exception e)
-                    {}
-                }
-                try {
-                    while (true) {
-                        Object obj = in.readObject();
-                        if (obj instanceof String) {
-                                Log.d("READ", obj.toString());
-                                final String newMessage = "\n" + obj.toString();
-                                handler.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        tv.append(newMessage);
-                                    }
-                                });
-
-                        }
-                    }
-                } catch (Exception e) {
-                    Log.d("Error",e.getMessage());
-                }
-            }
-        });
-        t.start();
-    }
-
 }

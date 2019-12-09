@@ -6,25 +6,23 @@
     android:orientation="vertical">
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/notFoundHeading"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="15dp"
         android:layout_marginTop="5dp"
-        android:text="TextView"
         android:textSize="24sp"
         android:textStyle="bold"
         tools:text="@string/notFoundTitle" />
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/notFoundBody"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="15dp"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
-        android:text="TextView"
-        tools:text="@string/notFoundDebug" />
+        tools:text="@string/notFoundBodyText" />
 
     <Button
         android:id="@+id/btnTryAgain"

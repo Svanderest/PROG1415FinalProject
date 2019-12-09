@@ -49,6 +49,9 @@ public class BusinessViewAdapter extends RecyclerView.Adapter<BusinessViewAdapte
         holder.leaveReview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                BusinessMessage msg = new BusinessMessage();
+                msg.BusinessID = item.id;
+                client.send(msg);
                 client.receive(new Runnable() {
                     @Override
                     public void run() {
@@ -56,10 +59,7 @@ public class BusinessViewAdapter extends RecyclerView.Adapter<BusinessViewAdapte
                         i.putExtra("Business",item);
                         mainActivity.startActivity(i);
                     }
-                });
-                BusinessMessage msg = new BusinessMessage();
-                msg.BusinessID = item.id;
-                client.send(msg);
+                }, msg.hashCode());
             }
         });
     }

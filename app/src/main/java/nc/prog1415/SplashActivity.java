@@ -30,12 +30,16 @@ public class SplashActivity extends AppCompatActivity {
             public void run() {
                 if(client.connected && !mp.isPlaying())
                 {
-                    Intent i = new Intent(SplashActivity.this, MainActivity.class);
+                    Intent i;
+                    if(client.businesses.size() > 0)
+                        i = new Intent(SplashActivity.this, MainActivity.class);
+                    else
+                        i = new Intent(SplashActivity.this, NotFoundActivity.class);
                     startActivity(i);
                 }
                 else
                     h.postDelayed(this,1500);
             }
-        });
+        },0);
     }
 }

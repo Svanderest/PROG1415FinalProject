@@ -32,7 +32,12 @@ public class FeedbackViewAdapter extends RecyclerView.Adapter<FeedbackViewAdapte
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         final Feedback item = client.feedback.get(position);
         holder.tvDate.setText(item.date.toString());
-        holder.tvComment.setText(item.comment);
+        if(item.comment.length() > 0) {
+            holder.tvComment.setText(item.comment);
+            holder.tvComment.setTextSize(16);
+        }
+        else
+            holder.tvComment.setText("This review contains no comment");
         holder.rb.setRating(item.rating);
     }
 
