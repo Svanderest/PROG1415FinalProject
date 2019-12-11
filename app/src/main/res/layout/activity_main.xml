@@ -16,6 +16,15 @@
         android:textSize="30sp"
         android:textStyle="bold" />
 
+    <TextView
+        android:id="@+id/updateLocation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="15sp"
+        android:layout_marginBottom="10sp"
+        android:text="Referesh Location"
+        android:textSize="10sp" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvBusiness"
         android:layout_width="match_parent"

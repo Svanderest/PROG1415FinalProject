@@ -10,6 +10,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.util.Pair;
 import android.widget.TextView;
 
 import java.io.IOException;
@@ -111,6 +112,7 @@ public class TcpClient extends AsyncTask<Void, byte[], Boolean> {
         return null;
     }
 
+
     public void send(final Object message)
     {
         Thread t = new Thread(new Runnable() {
@@ -130,6 +132,7 @@ public class TcpClient extends AsyncTask<Void, byte[], Boolean> {
         });
         t.start();
     }
+
     public void receive(final Runnable onReceipt, final int id)
     {
         final Handler h = new Handler();
@@ -139,11 +142,10 @@ public class TcpClient extends AsyncTask<Void, byte[], Boolean> {
             public void run() {
                 while (!(connected  && (sent.contains(id) || id == 0))) {
                     try {
-                        //this.wait();
+                        this.wait();
                     }
                     catch (Exception e)
                     {
-                        e.printStackTrace();
                     }
                 }
                 try {

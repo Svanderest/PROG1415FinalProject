@@ -44,8 +44,6 @@ public class BusinessViewAdapter extends RecyclerView.Adapter<BusinessViewAdapte
         holder.rb.setStepSize(0.1f);
         holder.rb.setRating(item.averageRating);
         holder.rb.setIsIndicator(true);
-        Log.d("ADRESS",item.address);
-        Log.d("RATING", String.valueOf(item.averageRating));
         holder.leaveReview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
