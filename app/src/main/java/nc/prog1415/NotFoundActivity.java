@@ -13,7 +13,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class NotFoundActivity extends AppCompatActivity {
-    boolean receiving = false;
+    private boolean receiving = false;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_not_found);
@@ -25,12 +25,12 @@ public class NotFoundActivity extends AppCompatActivity {
                 final TcpClient client = TcpClient.getClient();
                 Location androidLocation = client.location;
                 receiving = true;
-                nc.com.Location l = new nc.com.Location(androidLocation.getLongitude(),androidLocation.getLatitude());
+                final nc.com.Location l = new nc.com.Location(androidLocation.getLongitude(),androidLocation.getLatitude());
                 client.send(l);
                 client.receive(new Runnable() {
                     @Override
                     public void run() {
-                        if(client.businesses.size() > 0)
+                        if(client.lastReceiptID == l.hashCode())
                         {
                             Intent i = new Intent(NotFoundActivity.this, MainActivity.class);
                             startActivity(i);

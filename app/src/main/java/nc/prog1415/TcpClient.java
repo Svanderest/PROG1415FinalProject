@@ -50,6 +50,7 @@ public class TcpClient extends AsyncTask<Void, byte[], Boolean> {
     private LocationManager lm;
     public Location location = null;
     String serverLocation;
+    int lastReceiptID;
 
     public TcpClient(LocationManager lm)
     {
@@ -101,7 +102,7 @@ public class TcpClient extends AsyncTask<Void, byte[], Boolean> {
     protected Boolean doInBackground(Void... voids) {
         Log.d("CONNECTION","Connecting to server");
         try {
-            InetAddress address = InetAddress.getByName("192.168.93.77");
+            InetAddress address = InetAddress.getByName("192.168.2.136");
             socket = new Socket(address,8000);
             in = new ObjectInputStream(socket.getInputStream());
             out = new ObjectOutputStream(socket.getOutputStream());
@@ -175,11 +176,14 @@ public class TcpClient extends AsyncTask<Void, byte[], Boolean> {
                                 for(int i = 0; i < businesses.size(); i++)
                                 {
                                     long distance = Math.round(myLocation.getDistance(businesses.get(i)));
-                                    if(distance < 1000)
-                                        businesses.get(i).address += " - " + String.valueOf(distance) + "m";
-                                    else
-                                        businesses.get(i).address += " - " + String.valueOf(distance / 1000.0) + "km";
+                                    if(!businesses.get(i).address.contains(" - ")) {
+                                        if (distance < 1000)
+                                            businesses.get(i).address += " - " + String.valueOf(distance) + "m";
+                                        else
+                                            businesses.get(i).address += " - " + String.valueOf(distance / 1000.0) + "km";
+                                    }
                                 }
+                                lastReceiptID = id;
                             }
                             else if(((ArrayList)obj).get(0) instanceof Feedback) {
                                 feedback = (ArrayList<Feedback>)obj;
@@ -191,6 +195,7 @@ public class TcpClient extends AsyncTask<Void, byte[], Boolean> {
                                 });
                                 Log.d("Feedback",String.valueOf(((ArrayList)obj).size()) + " feedback objects received");
                                 validResult = true;
+                                lastReceiptID = id;
                             }
                         }
                         else if(obj instanceof ArrayList && ((ArrayList)obj).size() == 0) {
@@ -199,7 +204,6 @@ public class TcpClient extends AsyncTask<Void, byte[], Boolean> {
                         }
                         else
                             Log.d("MESSAGE TYPE",obj.getClass().getName());
-
                     }
                     //sent.remove(id);
                     h.post(onReceipt);

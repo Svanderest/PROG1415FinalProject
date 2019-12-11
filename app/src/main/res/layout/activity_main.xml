@@ -23,6 +23,7 @@
         android:layout_marginLeft="15sp"
         android:layout_marginBottom="10sp"
         android:text="Referesh Location"
+        android:textColor="@android:color/holo_blue_light"
         android:textSize="10sp" />
 
     <androidx.recyclerview.widget.RecyclerView
